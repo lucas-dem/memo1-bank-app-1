@@ -1,7 +1,11 @@
 package com.aninfo;
 
+
+import com.aninfo.exceptions.InvalidTransactionTypeException;
 import com.aninfo.model.Account;
+import com.aninfo.model.Transaction;
 import com.aninfo.service.AccountService;
+import com.aninfo.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -73,6 +77,38 @@ public class Memo1BankApp {
 	@PutMapping("/accounts/{cbu}/deposit")
 	public Account deposit(@PathVariable Long cbu, @RequestParam Double sum) {
 		return accountService.deposit(cbu, sum);
+	}
+
+
+	@PostMapping("/accounts/deposit")
+	@ResponseStatus(HttpStatus.CREATED)
+	public Transaction newDeposit(@RequestBody Transaction transaction) {
+
+		return accountService.generateDeposit(transaction);
+	}
+
+	@PostMapping("/accounts/withdrawal")
+	@ResponseStatus(HttpStatus.CREATED)
+	public Transaction newWithdrawal(@RequestBody Transaction transaction){
+
+		return accountService.generateDeposit(transaction);
+	}
+
+	@GetMapping("/accounts/transactions")
+	public Collection<Transaction> transactions(@RequestParam Long cbu) {
+		return accountService.getTransactionsByCbu(cbu);
+	}
+
+	@GetMapping("/transactions/{transactionId}")
+	public ResponseEntity<Transaction> getTransaction(@PathVariable Long transactionId){
+		Optional<Transaction> transaction = accountService.getTransactionsById(transactionId);
+
+		return ResponseEntity.of(transaction);
+	}
+
+	@DeleteMapping("/transactions/{transactionId}")
+	public void deleteTransaction(@PathVariable Long transactionId){
+		accountService.deleteTransaction(transactionId);
 	}
 
 	@Bean
